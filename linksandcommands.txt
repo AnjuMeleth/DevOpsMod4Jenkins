@@ -15,6 +15,34 @@ Setting up tomcat in Ubuntu system
  1717  sudo chown -R tomcat webapps/ work/ temp/ logs/
  1718  sudo update-java-alternatives -l
  1719  sudo nano /etc/systemd/system/tomcat.service
+# input below data
+[Unit]
+Description=Apache Tomcat Web Application Container
+After=network.target
+
+[Service]
+Type=forking
+
+Environment=JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre
+Environment=CATALINA_PID=/opt/tomcat/temp/tomcat.pid
+Environment=CATALINA_HOME=/opt/tomcat
+Environment=CATALINA_BASE=/opt/tomcat
+Environment='CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC'
+Environment='JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom'
+
+ExecStart=/opt/tomcat/bin/startup.sh
+ExecStop=/opt/tomcat/bin/shutdown.sh
+
+User=tomcat
+Group=tomcat
+UMask=0007
+RestartSec=10
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+# change the port where tomcat is run  as 8090
  1720  sudo systemctl daemon-reload
  1721  sudo systemctl start tomcat
  1722  sudo systemctl status tomcat
@@ -27,14 +55,25 @@ Setting up tomcat in Ubuntu system
 # For running the scripted pipeline for an addressbook application
 # Install Pipeline Maven Integration Plugin
 # USe M3 installation in Jenkins
-# In deployment we get permission denied error
-# to fix it 
-  146  chgrp -R tomcat /opt/tomcat/webapps
-  147  chmod -R g+w /opt/tomcat/webapps
-  148  usermod -aG tomcat jenkins
-# install HTML publisher
+
+common Errors
+========================
+# Make sure tomcat/webapps folder has write permissions
+Plugins you require to Install
+====================================
+# Pipeline Maven Integration Plugin
+# Build Pipeline Plugin
+# PMD Plug-in
+# Cobertura Plugin
+# Audit Trail
+Slave - Distributed Builds
+=================================
 # Jenkins slaves/agents are nothing just a small Java “Client” processes that connects to the “Master” Jenkins instance over the Java # Network Launch Protocol (JNLP).
 # install java in jenkins slave
 apt-get install openjdk-8-jdk
+
+Integrate with Git
+===================
+http://<ipaddress of jenkins master>:8080/github-webhook/ (push)
 
 
